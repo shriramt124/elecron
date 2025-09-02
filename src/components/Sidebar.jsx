@@ -3,26 +3,18 @@ import { NavLink } from 'react-router-dom';
 
 /**
  * Sidebar component
- * @param {boolean} isCollapsed - whether sidebar is collapsed
- * @param {Function} setIsCollapsed - toggle collapse
+ * @param {boolean} isCollapsed - whether sidebar is collapsed (no longer used)
+ * @param {Function} setIsCollapsed - toggle collapse (no longer used)
  * @param {Array} tabs - navigation tabs
  * @param {string} [logoImage] - optional logo image source path / URL
  * @param {string} [logoAlt] - alt text for logo image
  */
 const Sidebar = ({ isCollapsed, setIsCollapsed, tabs, logoImage, logoAlt = 'Logo' }) => {
-  // Hover to expand/collapse
-  const handleEnter = () => {
-    if (isCollapsed) setIsCollapsed(false);
-  };
-  const handleLeave = () => {
-    if (!isCollapsed) setIsCollapsed(true);
-  };
+  // Toggle functionality removed as requested
 
   return (
     <div
-  className={`fixed left-0 top-0 bottom-0 menu-surface-strong backdrop-blur-xl border-r ui-border shadow-[0_6px_18px_-8px_rgba(0,0,0,0.55)] transition-all duration-300 z-30 flex flex-col ${isCollapsed ? 'w-14' : 'w-56'}`}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
+  className="fixed left-0 top-0 bottom-0 menu-surface-strong backdrop-blur-xl border-r ui-border shadow-[0_6px_18px_-8px_rgba(0,0,0,0.55)] transition-all duration-300 z-30 flex flex-col w-14"
     >
       {/* Logo Section */}
   <div className="flex items-center p-3 border-b ui-border-sub flex-none">
@@ -52,15 +44,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, tabs, logoImage, logoAlt = 'Logo
                   <NavLink
                     to={`/${tab.id}`}
                     className={({ isActive }) => {
-                      const base = `group flex flex-1 items-center rounded-md transition-colors select-none ${isCollapsed ? 'justify-center' : 'pl-3 pr-2'} py-2 text-sm border border-transparent`;
+                      const base = "group flex flex-1 items-center justify-center rounded-md transition-colors select-none py-2 text-sm border border-transparent";
                       const active = 'menu-panel-alt text-brand-primary border-l-2 border-brand-primary/60';
                       const inactive = 'text-gray-400 hover:text-gray-200 hover:bg-[color:var(--surface-2)]/55';
                       return `${base} ${isActive ? active : inactive}`;
                     }}
                     title={tab.label}
                   >
-                    <i className={`${tab.icon} text-base ${!isCollapsed ? 'mr-3' : ''} transition-colors`}></i>
-                    {!isCollapsed && <span className="font-medium tracking-wide leading-none">{tab.label}</span>}
+                    <i className={`${tab.icon} text-base transition-colors`}></i>
                   </NavLink>
                 </li>
               ))}
@@ -70,8 +61,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, tabs, logoImage, logoAlt = 'Logo
       </nav>
       {/* Bottom Section */}
   <div className="p-3 border-t ui-border-sub flex-none">
-        <div className={`flex ${isCollapsed ? 'justify-center' : 'justify-between'} items-center transition-colors`}>
-      {!isCollapsed && <span className="text-[10px] uppercase tracking-wider text-cyber-light/40">v1.0.0</span>}
+        <div className="flex justify-center items-center transition-colors">
       <button className="text-gray-400 hover:text-brand-primary transition-colors focus-ring rounded-md px-1" title="Sign Out">
             <i className="fas fa-sign-out-alt text-sm"></i>
           </button>
