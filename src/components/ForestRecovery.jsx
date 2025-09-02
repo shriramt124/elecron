@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 
 // Adjusted: removed outer full-screen background & margin; parent provides layout
 const ForestRecovery = () => {
-  const [selectedRows, setSelectedRows] = useState(new Set());
-  const [selectAll, setSelectAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [domainFilter, setDomainFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -62,25 +60,27 @@ const ForestRecovery = () => {
     { action: 'Backup Completed', target: 'System state', time: '3 hours ago' }
   ];
 
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(domainControllers.map(dc => dc.id)));
-    }
-    setSelectAll(!selectAll);
-  };
+  // Filter domain controllers based on search and filter criteria
+  const filteredDomainControllers = domainControllers.filter(dc => {
+    // Search filter
+    const matchesSearch = !searchQuery || 
+      dc.domain.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dc.fqdn.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dc.netBIOS.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dc.site.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dc.samAccountName.toLowerCase().includes(searchQuery.toLowerCase());
 
-  const handleRowSelect = (id) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedRows(newSelected);
-    setSelectAll(newSelected.size === domainControllers.length);
-  };
+    // Domain type filter
+    const matchesDomainFilter = domainFilter === 'all' || 
+      (domainFilter === 'root' && dc.type === 'Root') ||
+      (domainFilter === 'child' && dc.type === 'Child');
+
+    // Status filter
+    const matchesStatusFilter = statusFilter === 'all' || 
+      dc.status.toLowerCase() === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesDomainFilter && matchesStatusFilter;
+  });
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -95,11 +95,9 @@ const ForestRecovery = () => {
     }
   };
 
-  // Export  rows
+  // Export filtered rows
   const handleExport = () => {
-    const rowsToExport = selectedRows.size > 0
-      ? domainControllers.filter(dc => selectedRows.has(dc.id))
-      : domainControllers;
+    const rowsToExport = filteredDomainControllers;
     const headers = ['Type','Domain','Domain SID','Site','SAM Account','NetBIOS','FQDN','GC','RO','IPv4 Address','Status'];
     const csvLines = [headers.join(',')];
     rowsToExport.forEach(dc => {
@@ -263,14 +261,6 @@ const ForestRecovery = () => {
                       <table className="min-w-full text-sm whitespace-nowrap table-fixed">{/* table-fixed prevents reflow height jumps */}
                         <thead className="menu-panel-alt border-b ui-border-sub">
                           <tr>
-                            <th className="text-left py-3 px-6 font-medium text-gray-300 w-12">
-                              <input
-                                type="checkbox"
-                                checked={selectAll}
-                                onChange={handleSelectAll}
-                                className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                              />
-                            </th>
                             <th className="text-left py-3 px-6 font-medium text-gray-300">Type</th>
                             <th className="text-left py-3 px-6 font-medium text-gray-300">Domain</th>
                             <th className="text-left py-3 px-6 font-medium text-gray-300">Domain SID</th>
@@ -285,16 +275,8 @@ const ForestRecovery = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-cyber-light/10">
-                          {domainControllers.map((dc) => (
+                          {filteredDomainControllers.map((dc) => (
                             <tr key={dc.id} className="hover:bg-[color:var(--surface-3)]/75 transition-colors">
-                              <td className="py-3 px-6">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedRows.has(dc.id)}
-                                  onChange={() => handleRowSelect(dc.id)}
-                                  className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                                />
-                              </td>
                               <td className="py-3 px-6 text-gray-300">{dc.type}</td>
                               <td className="py-3 px-6">
                                 <div className="flex items-center space-x-2">
@@ -324,14 +306,17 @@ const ForestRecovery = () => {
                   </div>
                 </div>
                 {/* Export Button - fixed beneath table container */}
-                <div className="mt-3 flex">
+                <div className="mt-3 flex justify-between items-center">
+                  <div className="text-xs text-gray-400 font-mono">
+                    Showing {filteredDomainControllers.length} of {domainControllers.length} domain controllers
+                  </div>
                   <button
                     onClick={handleExport}
                     className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium shadow transition-colors disabled:opacity-50"
-                    title={selectedRows.size > 0 ? 'Export selected rows' : 'Export all rows'}
+                    title="Export filtered data"
                   >
                     <i className="fas fa-file-export mr-2"></i>
-                    Export Data
+                    Export Data ({filteredDomainControllers.length})
                   </button>
                 </div>
               </div>
