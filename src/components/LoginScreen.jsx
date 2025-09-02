@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 const LoginScreen = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -7,21 +7,6 @@ const LoginScreen = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showDemoDropdown, setShowDemoDropdown] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDemoDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   // Mock user data
   const mockUsers = [
@@ -163,7 +148,7 @@ const LoginScreen = ({ onLogin }) => {
               <span className="px-3 text-[10px] tracking-wider uppercase text-cyber-light/40">Demo Accounts</span>
               <div className="flex-1 h-px bg-cyber-light/10" />
             </div>
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative">
               <button
                 type="button"
                 onClick={() => setShowDemoDropdown(!showDemoDropdown)}
@@ -177,20 +162,20 @@ const LoginScreen = ({ onLogin }) => {
               </button>
               
               {showDemoDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 z-[9999] rounded-lg border border-cyber-light/15 bg-cyber-dark/95 backdrop-blur-sm shadow-[0_8px_24px_-4px_rgba(0,0,0,0.6)] overflow-hidden animate-[fadeIn_.2s_ease]">
+                <div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border border-cyber-light/15 bg-cyber-dark/90 backdrop-blur-sm shadow-cyber-sm overflow-hidden">
                   {mockUsers.map((user, i) => (
                     <button
                       key={i}
                       onClick={() => handleDemoSelect(user)}
                       type="button"
-                      className="group w-full text-left px-3 py-2.5 hover:bg-cyber-dark/60 hover:bg-gradient-to-r hover:from-cyber-accent/10 hover:to-transparent transition-all border-b border-cyber-light/10 last:border-b-0"
+                      className="group w-full text-left px-3 py-2.5 hover:bg-cyber-dark/80 transition-colors border-b border-cyber-light/10 last:border-b-0"
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-xs font-semibold text-gray-200 group-hover:text-cyber-accent transition-colors">{user.name}</div>
-                          <div className="text-[10px] text-cyber-light/50 font-mono group-hover:text-cyber-light/70 transition-colors">{user.username} / {user.password}</div>
+                          <div className="text-xs font-semibold text-gray-200 group-hover:text-cyber-accent">{user.name}</div>
+                          <div className="text-[10px] text-cyber-light/50 font-mono">{user.username} / {user.password}</div>
                         </div>
-                        <i className="fas fa-arrow-right text-cyber-light/40 group-hover:text-cyber-accent text-xs transition-colors" />
+                        <i className="fas fa-arrow-right text-cyber-light/40 group-hover:text-cyber-accent text-xs" />
                       </div>
                     </button>
                   ))}
