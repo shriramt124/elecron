@@ -307,9 +307,6 @@ const ForestRecovery = () => {
                 </div>
                 {/* Export Button - fixed beneath table container */}
                 <div className="mt-3 flex justify-between items-center">
-                  <div className="text-xs text-gray-400 font-mono">
-                    Showing {filteredDomainControllers.length} of {domainControllers.length} domain controllers
-                  </div>
                   <button
                     onClick={handleExport}
                     className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium shadow transition-colors disabled:opacity-50"
@@ -318,6 +315,9 @@ const ForestRecovery = () => {
                     <i className="fas fa-file-export mr-2"></i>
                     Export Data ({filteredDomainControllers.length})
                   </button>
+                  <div className="text-xs text-gray-400 font-mono">
+                    Showing {filteredDomainControllers.length} of {domainControllers.length} domain controllers
+                  </div>
                 </div>
               </div>
             </div>
