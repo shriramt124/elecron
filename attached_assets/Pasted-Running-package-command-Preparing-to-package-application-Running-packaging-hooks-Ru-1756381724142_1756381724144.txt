@@ -1,0 +1,51 @@
+Running package command
+  ✔ Preparing to package application
+  ✔ Running packaging hooks
+    ✔ Running generateAssets hook
+    ✔ Running prePackage hook
+      ✔ [plugin-vite] Building production Vite bundles
+        ✔ Building main and preload targets...
+          ✔ Built target src/main.js
+          ✔ Built target src/preload.js
+        ✔ Building renderer targets...
+          ✔ Built target main_window
+  ❯ Packaging application
+    ❯ Packaging for x64 on win32
+      ✔ Copying files
+      ✔ Preparing native dependencies [5s]
+      ✖ Finalizing package
+        › The main entry point to your app was not found. Make sure "D:\androidprojects\my-new-app\.vite\build\main.js" exists and does    
+        not get ignored by your ignore option
+  ◼ Running postPackage hook
+◼ Running preMake hook
+◼ Making distributables
+◼ Running postMake hook
+
+You have set packagerConfig.ignore, the Electron Forge Vite plugin normally sets this automatically.
+
+Your packaged app may be larger than expected if you dont ignore everything other than the '.vite' folder
+You have set packagerConfig.ignore, the Electron Forge Vite plugin normally sets this automatically.
+
+Your packaged app may be larger than expected if you dont ignore everything other than the '.vite' folder
+Error in packageAfterCopy hook: TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received undefined
+    at Object.join (node:path:433:7)
+    at Proxy.packageAfterCopy (D:\androidprojects\my-new-app\forge.config.js:47:36)
+    at runHook (D:\androidprojects\my-new-app\node_modules\@electron-forge\core\dist\util\hook.js:17:34)
+    at D:\androidprojects\my-new-app\node_modules\@electron-forge\core\dist\api\package.js:163:50
+    at D:\androidprojects\my-new-app\node_modules\@electron-forge\core\dist\api\package.js:40:14
+    at node:internal/util:430:7
+    at new Promise (<anonymous>)
+    at node:internal/util:416:12
+    at D:\androidprojects\my-new-app\node_modules\@electron-forge\core\dist\api\package.js:52:59 {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+
+An unhandled rejection has occurred inside Forge:
+Error: The main entry point to your app was not found. Make sure "D:\androidprojects\my-new-app\.vite\build\main.js" exists and does not get ignored by your ignore option
+at validateElectronApp (D:\androidprojects\my-new-app\node_modules\@electron\packager\dist\common.js:104:15)
+    at async WindowsApp.buildApp (D:\androidprojects\my-new-app\node_modules\@electron\packager\dist\platform.js:119:9)
+    at async WindowsApp.initialize (D:\androidprojects\my-new-app\node_modules\@electron\packager\dist\platform.js:113:13)
+    at async WindowsApp.create (D:\androidprojects\my-new-app\node_modules\@electron\packager\dist\win32.js:91:9)
+    at async Promise.all (index 0)
+    at async packager (D:\androidprojects\my-new-app\node_modules\@electron\packager\dist\packager.js:240:22)
+PS D:\androidprojects\my-new-app> 

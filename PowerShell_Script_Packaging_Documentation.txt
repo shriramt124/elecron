@@ -1,0 +1,177 @@
+
+# PowerShell Script Packaging Issue in Electron - Detailed Documentation
+
+## Problem Overview
+
+You were encountering an issue where your Electron application could successfully locate and execute PowerShell scripts during development, but failed to find them when the application was packaged for distribution. The error message showed:
+
+```
+Error: Script not found: sample_api.ps1. Searched in: 
+C:\Users\Lenovo\AppData\Local\my_new_app\app-1.0.0\resources\app.asar.unpacked\scripts\sample_api.ps1, 
+C:\Users\Lenovo\AppData\Local\my_new_app\app-1.0.0\resources\scripts\sample_api.ps1, 
+C:\Users\Lenovo\AppData\Local\my_new_app\app-1.0.0\resources\app.asar\.vite\scripts\sample_api.ps1
+```
+
+## Root Cause Analysis
+
+### 1. ASAR Packaging Issue
+Electron packages application files into an ASAR (Atom Shell Application Resource) archive by default. External files like PowerShell scripts that need to be executed directly by the operating system cannot be accessed from within the ASAR archive because:
+- The OS cannot execute files that exist only inside an archive
+- PowerShell needs direct file system access to the script files
+
+### 2. Resource Path Resolution
+During development, scripts were located at `process.cwd()/scripts/`, but in packaged applications, the working directory and resource paths change significantly:
+- Development: Scripts at `./scripts/sample_api.ps1`
+- Packaged: Scripts need to be in `process.resourcesPath` or unpacked from ASAR
+
+### 3. Inconsistent Configuration
+The initial configuration had conflicting approaches:
+- Using `extraResource` to copy files to resources directory
+- Using `packageAfterCopy` hook to manually copy files
+- Incorrect path specifications in `extraResource`
+
+## Solution Implementation
+
+### Step 1: Configure ASAR Unpacking
+```javascript
+// forge.config.js
+asar: {
+  unpack: "scripts/**/*"  // Unpack all files in scripts directory
+}
+```
+This ensures PowerShell scripts are extracted to `app.asar.unpacked/scripts/` where the OS can access them.
+
+### Step 2: Configure Extra Resources
+```javascript
+// forge.config.js  
+extraResource: [
+  "./scripts"  // Copy scripts directory to resources folder
+]
+```
+This creates an additional copy in the `resources/scripts/` directory for redundancy.
+
+### Step 3: Implement Multi-Path Resolution
+```javascript
+// src/main.js - Updated script path resolution
+const possiblePaths = [
+  path.join(process.resourcesPath, 'scripts', scriptName),           // extraResource location
+  path.join(process.resourcesPath, 'app.asar.unpacked', 'scripts', scriptName), // asar unpacked
+  path.join(__dirname, '..', 'scripts', scriptName),                // relative to main
+  path.join(process.resourcesPath, 'app', 'scripts', scriptName)    // alternative location
+];
+
+scriptPath = possiblePaths.find(p => fs.existsSync(p));
+```
+
+### Step 4: Enhanced Error Reporting
+```javascript
+if (!scriptPath) {
+  console.error('Script not found in any of these locations:');
+  possiblePaths.forEach(p => console.error(' -', p));
+  return resolve({ 
+    success: false, 
+    error: `Script not found: ${scriptName}. Searched in: ${possiblePaths.join(', ')}`, 
+    output: '' 
+  });
+}
+```
+
+### Step 5: Synchronized ScriptHelper Utility
+Updated the `ScriptHelper` class to use the same multi-path resolution logic for consistency across the application.
+
+## Key Technical Details
+
+### ASAR vs Extra Resources
+- **ASAR Unpacked**: Files are extracted during installation but remain within the app directory structure
+- **Extra Resources**: Files are copied to the top-level resources directory, separate from the app bundle
+
+### Path Resolution Strategy
+1. **Primary**: `process.resourcesPath/scripts/` (extraResource)
+2. **Secondary**: `process.resourcesPath/app.asar.unpacked/scripts/` (asar unpacked)
+3. **Fallback**: Relative paths for edge cases
+
+### Why Both Methods?
+Using both `asar.unpack` and `extraResource` provides redundancy:
+- If one method fails during packaging, the other serves as backup
+- Different Electron versions or build configurations might place files differently
+- Ensures maximum compatibility across different deployment scenarios
+
+## Configuration Files Modified
+
+### forge.config.js
+- Configured `asar.unpack` to exclude scripts from archiving
+- Set `extraResource` to copy scripts to resources directory
+- Removed conflicting `packageAfterCopy` hook
+- Maintained proper timeout settings for packaging
+
+### src/main.js
+- Implemented robust multi-path script resolution
+- Enhanced error logging with all searched paths
+- Maintained backward compatibility with development mode
+
+### src/utils/scriptHelper.js
+- Synchronized path resolution logic with main process
+- Added comprehensive environment validation
+- Maintained utility functions for script management
+
+## Prevention of Future Issues
+
+1. **Always test packaged applications** - Development and packaged environments behave differently
+2. **Use multiple resource inclusion methods** - Redundancy prevents single points of failure
+3. **Implement comprehensive path resolution** - Check multiple possible locations
+4. **Enhanced logging** - Always log where files were searched to aid debugging
+5. **Consistent utilities** - Ensure helper classes use same logic as main process
+
+## Verification Steps
+
+After implementing the solution:
+1. Package the application: `npm run package`
+2. Navigate to the generated executable
+3. Run the packaged application
+4. Test PowerShell script execution functionality
+5. Verify scripts are found and executed successfully
+
+## Final forge.config.js Configuration
+
+```javascript
+module.exports = {
+  packagerConfig: {
+    asar: {
+      unpack: "scripts/**/*"
+    },
+    timeout: 300000, // 5 minutes timeout
+    extraResource: [
+      "./scripts"
+    ]
+  },
+  // ... rest of configuration
+};
+```
+
+## Final main.js Script Resolution Logic
+
+```javascript
+const findScriptPath = (scriptName) => {
+  const possiblePaths = [
+    path.join(process.resourcesPath, 'scripts', scriptName),
+    path.join(process.resourcesPath, 'app.asar.unpacked', 'scripts', scriptName),
+    path.join(__dirname, '..', 'scripts', scriptName),
+    path.join(process.resourcesPath, 'app', 'scripts', scriptName)
+  ];
+
+  return possiblePaths.find(p => fs.existsSync(p));
+};
+```
+
+This comprehensive solution addresses the core issue of resource accessibility in packaged Electron applications while providing robust fallback mechanisms and clear error reporting for future debugging.
+
+## Summary
+
+The issue was resolved by:
+1. Configuring ASAR to unpack script files during packaging
+2. Using extraResource to copy scripts to accessible locations
+3. Implementing multi-path resolution with fallbacks
+4. Adding comprehensive error logging
+5. Synchronizing all script-related utilities to use consistent logic
+
+The solution ensures PowerShell scripts are accessible in both development and production environments while maintaining reliability through redundant file placement and robust path resolution.
