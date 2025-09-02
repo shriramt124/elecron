@@ -6,6 +6,7 @@ const LoginScreen = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showDemoDropdown, setShowDemoDropdown] = useState(false);
 
   // Mock user data
   const mockUsers = [
@@ -36,8 +37,10 @@ const LoginScreen = ({ onLogin }) => {
     }, 800);
   };
 
-  const handleDemoLogin = (u) => {
-    setCredentials({ username: u.username, password: u.password });
+  const handleDemoSelect = (user) => {
+    setCredentials({ username: user.username, password: user.password });
+    setShowDemoDropdown(false);
+    setError('');
   };
 
   return (
@@ -138,30 +141,46 @@ const LoginScreen = ({ onLogin }) => {
             </button>
           </form>
 
-          {/* Demo Accounts */}
+          {/* Demo Accounts Dropdown */}
           <div className="mt-8">
             <div className="flex items-center mb-3">
               <div className="flex-1 h-px bg-cyber-light/10" />
               <span className="px-3 text-[10px] tracking-wider uppercase text-cyber-light/40">Demo Accounts</span>
               <div className="flex-1 h-px bg-cyber-light/10" />
             </div>
-            <div className="grid gap-2">
-              {mockUsers.map((user, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleDemoLogin(user)}
-                  type="button"
-                  className="group w-full text-left rounded-lg border border-cyber-light/15 bg-cyber-dark/60 hover:border-cyber-accent/40 hover:bg-cyber-dark/80 transition-colors px-3 py-2.5"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-gray-200 group-hover:text-cyber-accent">{user.name}</div>
-                      <div className="text-[10px] text-cyber-light/50 font-mono">{user.username} / {user.password}</div>
-                    </div>
-                    <i className="fas fa-arrow-right text-cyber-light/40 group-hover:text-cyber-accent text-xs" />
-                  </div>
-                </button>
-              ))}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowDemoDropdown(!showDemoDropdown)}
+                className="w-full flex items-center justify-between px-3 py-2.5 text-left rounded-lg border border-cyber-light/15 bg-cyber-dark/60 hover:border-cyber-accent/40 hover:bg-cyber-dark/80 transition-colors"
+              >
+                <div>
+                  <div className="text-xs font-semibold text-gray-200">Select Demo Account</div>
+                  <div className="text-[10px] text-cyber-light/50">Choose from available demo users</div>
+                </div>
+                <i className={`fas fa-chevron-down text-cyber-light/40 text-xs transition-transform ${showDemoDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showDemoDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border border-cyber-light/15 bg-cyber-dark/90 backdrop-blur-sm shadow-cyber-sm overflow-hidden">
+                  {mockUsers.map((user, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleDemoSelect(user)}
+                      type="button"
+                      className="group w-full text-left px-3 py-2.5 hover:bg-cyber-dark/80 transition-colors border-b border-cyber-light/10 last:border-b-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xs font-semibold text-gray-200 group-hover:text-cyber-accent">{user.name}</div>
+                          <div className="text-[10px] text-cyber-light/50 font-mono">{user.username} / {user.password}</div>
+                        </div>
+                        <i className="fas fa-arrow-right text-cyber-light/40 group-hover:text-cyber-accent text-xs" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
