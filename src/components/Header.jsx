@@ -167,45 +167,46 @@ const Header = ({ currentUser, onLogout, isCollapsed, setIsCollapsed }) => {
 
   return (
     <>
-      {/* Sidebar with custom logo */}
+      
       <Sidebar
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
         tabs={tabs}
-  // Public assets in Vite/Electron can be referenced directly from root
+   
   logoImage={'/PraveaLogo.png'}
         logoAlt="Pravea"
       />
       
-      {/* Main Header */}
+   
       <div 
   className={`fixed top-0 right-0 menu-surface backdrop-blur-md border-b ui-border shadow-[0_4px_12px_-6px_rgba(0,0,0,0.55)] transition-all duration-300 z-20 ${isCollapsed ? 'left-14' : 'left-56'}`}
       >
-        {/* Top Row: Search, Profile, Settings, Help */}
-  <div className="px-6 py-2.5 flex items-center justify-end border-b ui-border-sub">
+        
+  <div className="px-6 py-2.5 flex items-center justify-between border-b ui-border-sub">
           
-
-          {/* Right Side Icons */}
+          <div className="flex-1 max-w-md">
+             identIR
+          </div>
+         
           <div className="flex items-center space-x-6 ml-6">
-            {/* Settings */}
+            
             <button className="text-gray-400 hover:text-brand-primary transition-colors focus-ring rounded-md px-1">
               <i className="fas fa-cog"></i>
             </button>
             
-            {/* Notifications */}
+            
             <div className="relative">
               <button className="text-gray-400 hover:text-brand-primary transition-colors focus-ring rounded-md px-1">
                 <i className="fas fa-bell"></i>
                 <span className="absolute -top-1 -right-1 bg-cyber-danger text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
               </button>
             </div>
-            
-            {/* Help */}
+          
             <button className="text-gray-400 hover:text-brand-primary transition-colors focus-ring rounded-md px-1">
               <i className="fas fa-question-circle"></i>
             </button>
             
-            {/* User Menu */}
+           
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -243,8 +244,7 @@ const Header = ({ currentUser, onLogout, isCollapsed, setIsCollapsed }) => {
             </div>
           </div>
         </div>
-
-      {/* Tab Navigation */}
+ 
       <div className="relative">
   <div className="flex items-center px-8 py-1.5 menu-panel backdrop-blur-md border-b ui-border-sub">
     <div className="flex items-center justify-evenly w-full">
@@ -276,7 +276,7 @@ const Header = ({ currentUser, onLogout, isCollapsed, setIsCollapsed }) => {
           </div>
         </div>
 
-        {/* Refined Mega Dropdown */}
+        {/*   Dropdown */}
         {activeDropdown && currentTab && (
           <div
             className="absolute top-full left-0 right-0 z-50"
@@ -284,7 +284,7 @@ const Header = ({ currentUser, onLogout, isCollapsed, setIsCollapsed }) => {
             onMouseLeave={handleMouseLeave}
           >
             <div className="relative max-w-6xl mx-auto px-6">
-              {/* Arrow pointer */}
+              
               <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 menu-surface-strong border-t border-l ui-border"></div>
               <div className="overflow-hidden rounded-2xl backdrop-blur-xl menu-surface-strong border ui-border shadow-[0_12px_40px_-8px_rgba(0,0,0,0.7),0_4px_12px_-2px_rgba(0,0,0,0.5)] animate-[fadeIn_.25s_ease]">
                 <div className="grid md:grid-cols-3 gap-8 p-8 relative">
